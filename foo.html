@@ -184,8 +184,13 @@ $(window).on('load', function() {
             $("#accordion > div").accordion({ header: "h3", collapsible: true });
         })
     })(jQuery);
-$("#about").accordion('option', 'active' , 1);
-$("#settings").accordion('option', 'active' , 1);
+
+try {
+  $("#about").accordion('option', 'active' , 1);
+  $("#settings").accordion('option', 'active' , 1);
+}
+catch (err){}
+
 
 // general setup
 
