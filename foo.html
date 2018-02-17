@@ -1,0 +1,401 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="googlebot" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  
+
+  
+  
+  
+
+  
+
+  <script type="text/javascript" src="//code.jquery.com/jquery-git.js"></script>
+
+  
+
+  
+
+  
+    
+      <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.js"></script>
+    
+    
+      <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.css">
+    
+  
+
+  
+    <link rel="stylesheet" type="text/css" href="/css/result-light.css">
+  
+
+  
+    
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.js"></script>
+    
+  
+    
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+    
+  
+    
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.3/FileSaver.min.js"></script>
+    
+  
+
+  <style type="text/css">
+    
+
+html, body { width: 100%; height: 100%; }
+
+
+form {
+  margin: 20px 0;
+}
+
+form input,
+button {
+  padding: 5px;
+}
+
+table {
+  width: 100%;
+  margin-bottom: 20px;
+  border-collapse: collapse;
+}
+
+table,
+th,
+td {
+  border: 1px solid #cdcdcd;
+}
+
+table th,
+table td {
+  padding: 10px;
+  text-align: left;
+}
+
+#scroller
+{
+    border: 1px solid gray;
+    height: 60vh;
+    width: 100%;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.grid {
+  display: grid;
+  grid-gap: 0px;
+  grid-template-columns: repeat(auto-fill, 27px);
+}
+
+/*
+a {
+  background: green;
+  color: #eee;
+  padding: 5px 10px;
+}
+*/
+
+.button {
+  background-color: #010260;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 12px;
+  margin: 1px 1px;
+  cursor: pointer;
+
+  border: 1px solid black;
+  border-radius: 25px;
+}
+
+
+/* checkbox customization... */
+
+p {
+  margin : 4;
+}
+
+p+p {
+  margin : .5em 0 0;
+}:root input[type=checkbox] {
+  /* original check box are push outside the viewport */
+  position: absolute;
+  left: -1000em;
+}:root input[type=checkbox] + label:before {
+  content: "";
+  display: inline-block;
+  width  : 16px;
+  height : 16px;
+  margin : 0 .5em 0 0;
+  background: url("https://developer.mozilla.org/files/4173/checkbox-sprite.png") no-repeat 0 0;
+
+/* The following is used to adjust the position of 
+   the check boxes on the text baseline */
+
+  vertical-align: bottom;
+  position: relative;
+  bottom: 2px;
+}:root input[type=checkbox]:checked + label:before {
+  background-position: 0 -16px;
+}
+
+:root input[type=checkbox]:disabled + label:before {
+  background-position: 0 -32px;
+}
+
+:root input[type=checkbox]:checked:disabled + label:before {
+  background-position: 0 -48px;
+}:root input[type=checkbox]:focus + label:before {
+  outline: 1px dotted black;
+}
+
+  </style>
+
+  <title></title>
+
+  
+    
+
+
+
+
+<script type='text/javascript'>//<![CDATA[
+$(window).on('load', function() {
+// includes for jQuery and jQuery UI
+// includes for dom-to-image, html2canvas and FileSaver for the downloads
+
+// ui tweaks
+// setup the accordion
+(function($) {
+        $(function() {
+            $("#accordion > div").accordion({ header: "h3", collapsible: true });
+        })
+    })(jQuery);
+$("#about").accordion('option', 'active' , 1);
+$("#settings").accordion('option', 'active' , 1);
+
+// general setup
+
+var id = "1xCqAxBKNXHuATDgMmnstus8bOfdW_aUeHT4BJ-DuD-M";
+//var id = "1hbHqrnYa4oMUquZcq8WkTJk0kI0t9scGBwro-EH-ALA";
+
+var url = 'https://spreadsheets.google.com/feeds/cells/' + id + '/1/public/values?alt=json-in-script&callback=?';
+
+
+// Pokemon metadata
+
+pokemonMetadata = null;
+var rowData = [];
+
+$.getJSON(url, cellEntries);
+function cellEntries(json) {
+  var data = json.feed.entry;
+
+  var allData = [];
+  var rowData = [];
+  var row = 0;
+
+  for (var i = 0; i < data.length; i++) {
+    var cell = data[i]["gs$cell"];
+
+    if (cell.col == 1) {
+      if (++row > 1) {
+        allData.push(rowData);
+        rowData = [];
+      }
+    }
+
+    var val = cell["$t"];
+    rowData.push(val);
+
+  }
+
+  allData.push(rowData);
+
+	pokemonMetadata = allData;
+  show(allData);
+}
+
+
+
+
+function show(allData) {
+
+
+// FIXME use headings...
+
+  for (i = 1; i < allData.length; i++) {
+
+    var pokeName = allData[i][1];
+    var pokeAvailability = allData[i][8];
+    var pokeStatus = allData[i][9];
+
+
+imagePath = "https://www.google.com/images/hpp/ribbon-black-96x136.png";
+nameForImage = pokeName;
+
+imagePath = "https://galvanize-cors-proxy.herokuapp.com/https://pkmref.com/images/set_1/" + i + ".png";
+
+if (false) {
+if (i == 29) nameForImage = "Nidoran_F";
+if (i == 32) nameForImage = "Nidoran_M";
+if (i == 122) nameForImage = "MrMime";
+if (i == 386) nameForImage = "Deoxys";
+
+imagePath = "http://static.pokemonpets.com/images/monsters-images-60-60/" + i + "-" + nameForImage +  ".png";
+}
+else if (false) {
+if (i < 254)
+	imagePath ="https://pokemongo.gamepress.gg/sites/default/files/2018-01/pokemon_icon_" + i.toString().padStart(3, '0') + "_00.png";
+else
+	"https://pokemongo.gamepress.gg/sites/default/files/styles/240w/public/2017-08/" + i + "_0.png";
+  }
+
+//imagePath = "http://104.236.41.62:8000/resources/imageSet1/" + i + ".png";
+
+    $('#graphs').append(
+      "<div id ='pokeBox" + i + "'> " +
+
+"<input type='checkbox' id='chk" + i + "' name='unused' value='unused'><label id='chkLbl" + i + "' for='chk" + i + "'></label>" +
+"<img id='img" + i + "' 	src=' " + imagePath  +
+	
+      "' style='width:25px;height:25px;' title='\n" + i + " " + pokeName + " status " + pokeStatus + "'>");
+
+let ix = i;
+$('#chk' + i).click(function() {
+	if ($('#chk' + ix).is(':checked')) {
+   	localStorage.setItem("pokemonUserValue" + ix, 1);
+ 	 	$("#img" + ix).css({
+      "background-color": "green"
+    });
+  }
+  else
+  {
+   localStorage.setItem("pokemonUserValue" + ix, -1);
+ 	 $("#img" + ix).css({
+      "background-color": "red"
+    });
+    }
+  })
+
+
+	if (localStorage.getItem("pokemonUserValue" + i) == -1) $("#img" + i).css({
+      "background-color": "purple"
+    });
+    else if (pokeStatus === "n/a") $("#img" + i).css({
+      opacity: 0.1,
+      "background-color": "#111111"
+    });
+    else if (pokeStatus === "Y") $("#img" + i).css({
+      "background-color": "#CCFFCC"
+    });
+    else if (pokeStatus === "Soonish") $("#img" + i).css({
+      "background-color": "orange"
+    });
+    else if (pokeStatus === "N") $("#img" + i).css({
+      "background-color": "#FFCCCC"
+    });
+    else
+      $("#img" + i).css({
+        "background-color": "red"
+      });
+
+
+  }
+}
+
+$('#button2').click(function() {
+  domtoimage.toBlob(document.getElementById('graphs'))
+    .then(function(blob) {
+      window.saveAs(blob, 'my-node.png');
+    });
+});
+
+$('#button3').click(function() {
+ for (var i = 0; i < pokemonMetadata.length; i++)
+  $('#chkLbl' + i).toggle();
+});
+
+$('#button4').click(function() {
+ for (var i = 0; i < pokemonMetadata.length; i++)
+ {
+   gen = pokemonMetadata[i][11];
+   if (gen == 1 || gen == 3) // FIXME CHECKBOXES
+     $('#pokeBox' + i).toggle();
+     }
+});
+
+});//]]> 
+
+</script>
+
+  
+</head>
+
+<body>
+  <script type="text/javascript">
+    (function($) {
+        $(function() {
+            $("#accordion > div").accordion({ header: "h3", collapsible: true });
+        })
+    })(jQuery);
+</script>
+
+
+<center><h1>Personal Pokemon Catalog</h1></center>
+
+<div id="accordion">
+    <div id="about">
+        <h3><a href="#">About</a></h3>
+        <div>
+        
+  
+            help text here  
+            </div>
+    </div>
+    <div id="settings">
+        <h3><a href="#">Settings</a></h3>
+            <div>
+                
+<input type="button" id="button2" class="button" value="Download an Image" />
+<input type="button" id="button3" class="button" value="Misc Test" />
+<input type="button" id="button4" class="button" value="Misc Test4" />
+            
+            </div>
+        
+    </div>
+</div>
+
+<div id="scroller">
+  <div id="graphs" class="grid">
+  </div>
+</div>
+
+  
+  <script>
+  // tell the embed parent frame the height of the content
+  if (window.parent && window.parent.parent){
+    window.parent.parent.postMessage(["resultsFrame", {
+      height: document.body.getBoundingClientRect().height,
+      slug: "None"
+    }], "*")
+  }
+</script>
+
+</body>
+
+</html>
+
